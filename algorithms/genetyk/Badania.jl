@@ -87,16 +87,16 @@ function badanie_GA(problem::String, functions::GeneticFunctions)
     dict = structToDict(readTSP("./algorithms/genetyk/Data/"*problem))
     initialize_dict(dict)
     dimension = dict[:dimension]
-    Threads.@threads for i in 1:16
+    Threads.@threads for i in 1:12
         println("Iteration: $i t: $(Threads.threadid())")
         sample = []
         parameters::Config = Config(
             dict,
             Second(60),
-            rand(dimension:(dimension*dimension)),
-            rand(dimension:(dimension*dimension)/2),
-            rand(Float64)%0.05,
-            rand(1000:10000)
+            2*dimension,
+            dimension,
+            0.05,
+            1000
         )
     #     IF_functions::GeneticFunctions = GeneticFunctions(
     #     k_means_clustering,
@@ -117,8 +117,9 @@ function badanie_GA(problem::String, functions::GeneticFunctions)
     return results
 end
 problems = ["kroB100.tsp","kroA100.tsp","gr17.tsp","eil101.tsp","eil51.tsp","a280.tsp","lin105.tsp", "berlin52.tsp",
-           "ry48p.atsp","p43.atsp","br17.atsp"]
+    "ry48p.atsp","p43.atsp","kro124p.atsp","ftv64.atsp","ftv44.atsp","ftv35.atsp","ftv33.atsp","br17.atsp"]
 lk = ReentrantLock()
+
 for problem in problems
     println("instancja: $problem")
     dict = structToDict(readTSP("./algorithms/genetyk/Data/"*problem))

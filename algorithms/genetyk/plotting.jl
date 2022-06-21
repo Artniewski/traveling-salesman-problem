@@ -3,6 +3,9 @@ using JSON
 using HypothesisTests
 using Pingouin
 using DataFrames
+using Random
+using Statistics
+
 
 function best_parametres()
      for (root, dirs, files) in walkdir("./algorithms/genetyk/jsons")
@@ -431,4 +434,62 @@ function best_parametres_size()
        end
    end
 end
-best_parametres_size()
+
+function porównanie()
+    problems = ["kroB100.tsp","kroA100.tsp","gr17.tsp","eil101.tsp","eil51.tsp","a280.tsp","lin105.tsp", "berlin52.tsp",
+    "ry48p.atsp","p43.atsp","kro124p.atsp","ftv64.atsp","ftv44.atsp","ftv35.atsp","ftv33.atsp","br17.atsp"]
+    wyniki1 = Dict{String,Array}()
+    wyniki2 = Dict{String,Array}()
+    for (root, dirs, files) in walkdir("./algorithms/genetyk/jsonsPorównania1")
+        for file in files
+            result1 = []
+            f = open("./algorithms/genetyk/jsonsPorównania1/"*file)
+            df = JSON.parse(read(f,String))
+            name = ""
+            for problem in problems
+                if contains(file,problem)
+                    name = problem
+                    wyniki1[problem] = []
+                    break
+                end
+            end
+            for i in 1:length(df[name])
+                push!(result1,df[name][i][3][length(df[name][i][3])][1])
+            end
+            push!(wyniki1[name],mean(result1))
+            push!(wyniki1[name],median(result1))
+        end
+    end
+    for (root, dirs, files) in walkdir("./algorithms/genetyk/jsonsPorównania2")
+        for file in files
+            result1 = []
+            f = open("./algorithms/genetyk/jsonsPorównania2/"*file)
+            df = JSON.parse(read(f,String))
+            name = ""
+            for problem in problems
+                if contains(file,problem)
+                    name = problem
+                    wyniki2[problem] = []
+                    break
+                end
+            end
+            for i in 1:length(df[name])
+                push!(result1,df[name][i][3][length(df[name][i][3])][1])
+            end
+            push!(wyniki2[name],mean(result1))
+            push!(wyniki2[name],median(result1))
+        end
+
+    end
+    fuzja = Dict{String,Array}()
+    fuzja["wyniki1"] = []
+    fuzja["wyniki2"] = []
+    for (key,value) in wyniki1
+        push!(fuzja["wyniki1"],value[1])
+    end
+    for (key,value) in wyniki2
+        push!(fuzja["wyniki2"],value[1])
+    end
+    statistical_tests(fuzja)
+end
+porównanie()
